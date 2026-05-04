@@ -1,12 +1,14 @@
-from google import genai
-import os
+import anthropic
 
-client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+client = anthropic.Anthropic()
 
 def classify_article(title, content):
-    response = client.models.generate_content(
-        model="gemini-2.0-flash",
-        contents=f"""Article title: {title}
+    message = client.messages.create(
+        model="claude-opus-4-5",
+        max_tokens=300,
+        messages=[{
+            "role": "user",
+            "content": f"""Article title: {title}
 Article content: {content}
 
 1. Write a 2-sentence summary.
@@ -15,5 +17,6 @@ Article content: {content}
 Respond in this format:
 SUMMARY: ...
 CATEGORY: ..."""
+        }]
     )
-    return response.text
+    return message.content[0].text
