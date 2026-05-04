@@ -1,11 +1,12 @@
-import google.generativeai as genai
+from google import genai
 import os
 
-genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-model = genai.GenerativeModel("gemini-1.5-flash")
+client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 
 def classify_article(title, content):
-    response = model.generate_content(f"""Article title: {title}
+    response = client.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=f"""Article title: {title}
 Article content: {content}
 
 1. Write a 2-sentence summary.
@@ -13,5 +14,6 @@ Article content: {content}
 
 Respond in this format:
 SUMMARY: ...
-CATEGORY: ...""")
+CATEGORY: ..."""
+    )
     return response.text
