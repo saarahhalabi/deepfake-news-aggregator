@@ -18,14 +18,21 @@ def main():
             continue
 
         print(f"Classifying: {article['title']}")
-        response = classify_article(article["title"], article["content"])
 
-        lines = response.strip().split("\n")
-        summary = next((l.replace("SUMMARY:", "").strip() for l in lines if l.startswith("SUMMARY:")), "")
-        category = next((l.replace("CATEGORY:", "").strip() for l in lines if l.startswith("CATEGORY:")), "Other")
+        try:
+            response = classify_article(article["title"], article["content"])
+
+            lines = response.strip().split("\n")
+            summary = next((l.replace("SUMMARY:", "").strip() for l in lines if l.startswith("SUMMARY:")), "")
+            category = next((l.replace("CATEGORY:", "").strip() for l in lines if l.startswith("CATEGORY:")), "Other")
+
+        except Exception as e:
+            print(f"Error classifying: {e}")
+            summary = ""
+            category = "Other"
 
         conn.execute("UPDATE articles SET summary=?, classification=? WHERE url=?",
-                     (summary, category, article["url"]))
+             (summary, category, article["url"]))
 
     conn.commit()
     conn.close()
